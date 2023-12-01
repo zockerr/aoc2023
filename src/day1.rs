@@ -1,6 +1,5 @@
 use std::io::stdin;
 use color_eyre::eyre::{eyre, Result};
-use color_eyre::owo_colors::OwoColorize;
 use itertools::Itertools;
 
 #[allow(dead_code)]
@@ -33,24 +32,6 @@ fn parse_line(line: &str) -> Result<i32> {
     value_string.parse::<i32>().map_err(|_|eyre!("Could not parse!"))
 }
 
-fn replace_number_words(input: &str) -> Result<String> {
-    let mut current = 0;
-    let mut result = String::new();
-    while current < input.len() {
-        let s = &input[current..input.len()];
-        if(s).starts_with("one") {result.push('1'); current += 3;}
-        else if(s).starts_with("two") {result.push('2'); current += 3;}
-        else if(s).starts_with("three") {result.push('3'); current += 5;}
-        else if(s).starts_with("four") {result.push('4'); current += 4;}
-        else if(s).starts_with("five") {result.push('5'); current += 4;}
-        else if(s).starts_with("six") {result.push('6'); current += 3;}
-        else if(s).starts_with("seven") {result.push('7'); current += 5;}
-        else if(s).starts_with("eight") {result.push('8'); current += 5;}
-        else if(s).starts_with("nine") {result.push('9'); current += 4;}
-        else {result.push(s.chars().next().ok_or(eyre!("wat."))?); current += 1;}
-    }
-    Ok(result)
-}
 
 fn find_first_digit(input: &str) -> Result<char> {
     let mut current = 0;
@@ -103,28 +84,6 @@ mod tests {
         assert!(matches!(parse_line("pqr3stu8vwx"), Ok(38)));
         assert!(matches!(parse_line("1abc2"), Ok(12)));
         assert!(matches!(parse_line("treb7uchet"), Ok(77)));
-    }
-
-    #[test]
-    fn replace_number_words_test() -> Result<()> {
-        assert_eq!(replace_number_words("two1nine")?, "219");
-        assert_eq!(replace_number_words("eightwothree")?, "8wo3");
-        assert_eq!(replace_number_words("abcone2threexyz")?, "abc123xyz");
-        assert_eq!(replace_number_words("xtwone3four")?, "x2ne34");
-        assert_eq!(replace_number_words("4nineeightseven2")?, "49872");
-        assert_eq!(replace_number_words("zoneight234")?, "z1ight234");
-        assert_eq!(replace_number_words("eighttkbtzjz6nineeight")?, "8tkbtzjz698");
-        assert_eq!(replace_number_words("5knjbxgvhktvfcq89onefive")?, "5knjbxgvhktvfcq8915");
-        assert_eq!(replace_number_words("hnjcrxeightonejnlvm4hstmcsevensix")?, "hnjcrx81jnlvm4hstmc76");
-        assert_eq!(replace_number_words("trsdgcxcseven39dpmzs")?, "trsdgcxc739dpmzs");
-        assert_eq!(replace_number_words("oneninesixtwo26")?, "196226");
-        assert_eq!(replace_number_words("dppthreeh32twobhrqzks")?, "dpp3h322bhrqzks");
-        assert_eq!(replace_number_words("1cxklgfbvhsnccfive4")?, "1cxklgfbvhsncc54");
-        assert_eq!(replace_number_words("foursgjsevenseven5five19")?, "4sgj775519");
-        assert_eq!(replace_number_words("nrrk87")?, "nrrk87");
-        assert_eq!(replace_number_words("63ntkjbvcv3ntdcptmvheight78")?, "63ntkjbvcv3ntdcptmvh878");
-        assert_eq!(replace_number_words("7xv3one")?, "7xv31");
-        Ok(())
     }
 
     #[test]
