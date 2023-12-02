@@ -1,5 +1,6 @@
+use std::cmp::max;
 use std::io::stdin;
-use color_eyre::eyre::{eyre, WrapErr, Result};
+use color_eyre::eyre::{eyre, Result};
 use itertools::Itertools;
 use nom::branch::alt;
 use nom::bytes::complete::tag;
@@ -11,10 +12,22 @@ use nom::sequence::{separated_pair};
 
 
 #[allow(dead_code)]
-pub fn day2part1() -> color_eyre::Result<()> {
+pub fn day2part1() -> Result<()> {
     let result: i32 = stdin().lines().map(|line| {
         let (_, game)= parse_game(&line?).finish().map_err(|_| eyre!("parsing error"))?;
         let value:Result<i32> = Ok(if game.is_possible() { game.id } else { 0 });
+        value
+    })
+        .fold_ok(0, |a, b| a + b)?;
+    println!("{result}");
+    Ok(())
+}
+
+#[allow(dead_code)]
+pub fn day2part2() -> Result<()> {
+    let result: i32 = stdin().lines().map(|line| {
+        let (_, game)= parse_game(&line?).finish().map_err(|_| eyre!("parsing error"))?;
+        let value:Result<i32> = Ok(power(game.minimal()));
         value
     })
         .fold_ok(0, |a, b| a + b)?;
@@ -31,6 +44,10 @@ struct Game {
 impl Game {
     fn is_possible(&self) -> bool {
         self.rounds.iter().all(GameRound::is_possible)
+    }
+
+    fn minimal(&self) -> (i32, i32, i32) {
+        self.rounds.iter().fold((0,0,0), |(red, green, blue), game_round| (max(red, game_round.red), max(green, game_round.green), max(blue, game_round.blue)))
     }
 }
 
@@ -85,6 +102,10 @@ fn parse_game(input: &str) -> IResult<&str, Game> {
     Ok(("", Game{id, rounds}))
 }
 
+fn power(colorset: (i32, i32, i32)) -> i32 {
+    colorset.0 * colorset.1 * colorset.2
+}
+
 
 
 #[cfg(test)]
@@ -128,6 +149,28 @@ mod tests {
                     GameRound{blue: 4, red: 1, green: 3},
                     GameRound{blue: 1, red: 0, green: 1}]},
             parse_game("Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue").unwrap().1
+        );
+    }
+
+    #[test]
+    fn minimal_test() {
+        assert_eq!(
+            Game{
+                id: 1,
+                rounds: vec![
+                    GameRound{blue: 3, red: 4, green: 0},
+                    GameRound{blue: 6, red: 1, green: 2},
+                    GameRound{blue: 0, red: 0, green: 2}]}.minimal(),
+            (4,2,6)
+        );
+        assert_eq!(
+            Game{
+                id: 2,
+                rounds: vec![
+                    GameRound{blue: 1, red: 0, green: 2},
+                    GameRound{blue: 4, red: 1, green: 3},
+                    GameRound{blue: 1, red: 0, green: 1}]}.minimal(),
+            (1,3,4)
         );
     }
 }

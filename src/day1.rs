@@ -8,7 +8,7 @@ pub fn day1part1() -> Result<()> {
     println!("{result}");
     Ok(())
 }
-
+#[allow(dead_code)]
 pub fn day1part2() -> Result<()> {
     let result: i32 = stdin().lines()
         .map(|line| {
