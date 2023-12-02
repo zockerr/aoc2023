@@ -1,11 +1,12 @@
 use color_eyre::eyre::{Result};
-use crate::day1::{day1part2};
+use crate::day2::day2part1;
 
 mod day1;
+mod day2;
 
 fn main() -> Result<()> {
     color_eyre::install()?;
-    day1part2()?;
+    day2part1()?;
     Ok(())
 }
 
