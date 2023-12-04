@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{HashSet, VecDeque};
 use std::io::stdin;
 use color_eyre::eyre::{eyre, Result};
 use itertools::Itertools;
@@ -21,6 +21,10 @@ impl Card {
             Ok(0)
         }
     }
+
+    fn points2(&self) -> usize{
+        self.picked_numbers.intersection(&self.winning_numbers).count()
+    }
 }
 
 #[allow(dead_code)]
@@ -32,6 +36,28 @@ pub fn day4part1() -> Result<()> {
         })
         .map(|card: Result<Card>| card?.points())
         .fold_ok(0, |a, b| a + b)?;
+    println!("{result}");
+    Ok(())
+}
+
+#[allow(dead_code)]
+pub fn day4part2() -> Result<()> {
+    let mut cards: VecDeque<(i32, usize)> = stdin().lines()
+        .map::<Result<_>,_>(|line| {
+            let (_, card)= parse_card(&line?).finish().map_err(|_| eyre!("parsing error"))?;
+            Ok((1, card.points2()))
+        }).try_collect()?;
+    let mut result = 0;
+    while !cards.is_empty() {
+        let (amount, points) = cards.pop_front().unwrap();
+        result += amount;
+        for i in 0..points {
+            if let Some((a2, _)) = cards.get_mut(i) {
+                *a2 += amount
+            }
+        }
+    }
+
     println!("{result}");
     Ok(())
 }
